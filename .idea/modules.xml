@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ReemanPnP.iml" filepath="$PROJECT_DIR$/ReemanPnP.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cameraLibrary/cameraLibrary.iml" filepath="$PROJECT_DIR$/cameraLibrary/cameraLibrary.iml" />
     </modules>
   </component>
 </project>
