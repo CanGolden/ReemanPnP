@@ -14,16 +14,24 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".forcamera.AlbumAty" />
-        <activity android:name=".forcamera.AlbumItemAty" />
-        <activity android:name=".forcamera.CameraAty" />
+        <activity
+            android:name=".forcamera.AlbumAty"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".forcamera.AlbumItemAty"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".forcamera.CameraAty"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

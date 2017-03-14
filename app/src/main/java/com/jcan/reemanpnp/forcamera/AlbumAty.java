@@ -20,7 +20,6 @@ import android.widget.TextView;
 import com.jcan.reemanpnp.R;
 import com.linj.FileOperateUtil;
 import com.linj.album.view.AlbumGridView;
-import com.linj.album.view.AlbumGridView.AlbumViewAdapter;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -42,7 +41,7 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
     private TextView mSelectAllView;
     private Button mDeleteButton;
     private ImageView mBackView;
-    private Button mCutButton;
+    private List<String> paths;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +57,6 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
         mSelectAllView = (TextView) findViewById(R.id.select_all);
         mSelectedCounterView = (TextView) findViewById(R.id.header_bar_select_counter);
         mDeleteButton = (Button) findViewById(R.id.delete);
-        mCutButton = (Button) findViewById(R.id.move);
         mBackView = (ImageView) findViewById(R.id.header_bar_back);
 
         mSelectedCounterView.setText("0");
@@ -67,9 +65,10 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
         mLeaveView.setOnClickListener(this);
         mSelectAllView.setOnClickListener(this);
         mDeleteButton.setOnClickListener(this);
-        mCutButton.setOnClickListener(this);
         mBackView.setOnClickListener(this);
 
+        paths = new ArrayList<String>();
+        mAlbumView.setAdapter(mAlbumView.new AlbumViewAdapter(paths));
         mAlbumView.setOnItemClickListener(new OnItemClickListener() {
 
             @Override
@@ -108,7 +107,7 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
         String thumbFolder = FileOperateUtil.getFolderPath(this, FileOperateUtil.TYPE_THUMBNAIL, rootPath);
         List<File> files = FileOperateUtil.listFiles(thumbFolder, format);
         if (files != null && files.size() > 0) {
-            List<String> paths = new ArrayList<String>();
+            paths = new ArrayList<String>();
             for (File file : files) {
                 paths.add(file.getAbsolutePath());
             }
@@ -126,7 +125,6 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 
     @Override
     public void onClick(View v) {
-        // TODO Auto-generated method stub
         switch (v.getId()) {
             case R.id.header_bar_enter_selection:
                 enterEdit();
@@ -141,8 +139,7 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
                 showDeleteDialog();
                 break;
             case R.id.header_bar_back:
-                Intent intent = new Intent(this, CameraAty.class);
-                startActivity(intent);
+                finish();
                 break;
             default:
                 break;
@@ -153,7 +150,6 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
         mAlbumView.setEditable(true, this);
         mSelectAllView.setText(getResources().getString(R.string.album_phoot_select_all));
         mDeleteButton.setEnabled(false);
-        mCutButton.setEnabled(false);
         findViewById(R.id.header_bar_navi).setVisibility(View.GONE);
         findViewById(R.id.header_bar_select).setVisibility(View.VISIBLE);
         findViewById(R.id.album_bottom_bar).setVisibility(View.VISIBLE);
@@ -161,7 +157,6 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
 
     private void leaveEdit() {
         mAlbumView.setEditable(false);
-        mCutButton.setEnabled(false);
         findViewById(R.id.header_bar_navi).setVisibility(View.VISIBLE);
         findViewById(R.id.header_bar_select).setVisibility(View.GONE);
         findViewById(R.id.album_bottom_bar).setVisibility(View.GONE);
@@ -211,10 +206,8 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
         mSelectedCounterView.setText(String.valueOf(set.size()));
         if (set.size() > 0) {
             mDeleteButton.setEnabled(true);
-            mCutButton.setEnabled(true);
         } else {
             mDeleteButton.setEnabled(false);
-            mCutButton.setEnabled(false);
         }
     }
 
@@ -224,6 +217,7 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
             leaveEdit();
             return;
         }
+        finish();
         super.onBackPressed();
     }
 }
