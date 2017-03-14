@@ -1,6 +1,5 @@
 package com.jcan.reemanpnp.forcamera;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -8,8 +7,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
@@ -17,6 +14,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.jcan.reemanpnp.BaseActivity;
 import com.jcan.reemanpnp.R;
 import com.linj.FileOperateUtil;
 import com.linj.album.view.AlbumGridView;
@@ -26,14 +24,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class AlbumAty extends Activity implements View.OnClickListener, AlbumGridView.OnCheckedChangeListener {
+public class AlbumAty extends BaseActivity implements View.OnClickListener, AlbumGridView.OnCheckedChangeListener {
     public final static String TAG = "AlbumAty";
     /**
      * 显示相册的View
      */
     private AlbumGridView mAlbumView;
-
-    private String mSaveRoot;
 
     private TextView mEnterView;
     private TextView mLeaveView;
@@ -46,9 +42,6 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.album);
 
         mAlbumView = (AlbumGridView) findViewById(R.id.albumview);
@@ -91,8 +84,6 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
                 return true;
             }
         });
-        mSaveRoot = "test";
-
 
     }
 
@@ -106,19 +97,19 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
         //获取根目录下缩略图文件夹
         String thumbFolder = FileOperateUtil.getFolderPath(this, FileOperateUtil.TYPE_THUMBNAIL, rootPath);
         List<File> files = FileOperateUtil.listFiles(thumbFolder, format);
+        paths = new ArrayList<String>();
         if (files != null && files.size() > 0) {
-            paths = new ArrayList<String>();
             for (File file : files) {
                 paths.add(file.getAbsolutePath());
             }
-            mAlbumView.setAdapter(mAlbumView.new AlbumViewAdapter(paths));
         }
+        mAlbumView.setAdapter(mAlbumView.new AlbumViewAdapter(paths));
     }
 
 
     @Override
     protected void onResume() {
-        loadAlbum(mSaveRoot, ".jpg");
+        loadAlbum(FileConfig.mSaveRoot, ".jpg");
         super.onResume();
     }
 
@@ -179,20 +170,18 @@ public class AlbumAty extends Activity implements View.OnClickListener, AlbumGri
                 .setPositiveButton("确认", new OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // TODO Auto-generated method stub
                         Set<String> items = mAlbumView.getSelectedItems();
                         for (String path : items) {
                             boolean flag = FileOperateUtil.deleteThumbFile(path, AlbumAty.this);
                             if (!flag) Log.i(TAG, path);
                         }
-                        loadAlbum(mSaveRoot, ".jpg");
+                        loadAlbum(FileConfig.mSaveRoot, ".jpg");
                         leaveEdit();
                     }
                 })
                 .setNegativeButton("取消", new OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // TODO Auto-generated method stub
                         dialog.dismiss();
                     }
                 });

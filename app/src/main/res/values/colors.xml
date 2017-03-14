@@ -10,4 +10,5 @@
     <color name="common_text_yellow">#ffffe049</color>
     <color name="album_item_bg">#fffcfcfd</color>
     <color name="video_playter_bg">#333333</color>
+    <color name="black">#000000</color>
 </resources>

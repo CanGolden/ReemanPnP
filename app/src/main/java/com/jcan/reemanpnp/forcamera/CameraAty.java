@@ -1,18 +1,18 @@
 package com.jcan.reemanpnp.forcamera;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.hardware.Camera;
 import android.media.ThumbnailUtils;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.jcan.reemanpnp.BaseActivity;
 import com.jcan.reemanpnp.R;
 import com.linj.FileOperateUtil;
 import com.linj.album.view.FilterImageView;
@@ -23,10 +23,9 @@ import com.linj.camera.view.CameraView.FlashMode;
 import java.io.File;
 import java.util.List;
 
-public class CameraAty extends Activity implements View.OnClickListener, TakePictureListener {
+public class CameraAty extends BaseActivity implements View.OnClickListener, TakePictureListener, CameraContainer.MyPreviewCallback {
     public final static String TAG = "CameraAty";
     private boolean mIsRecordMode = false;
-    private String mSaveRoot;
     private CameraContainer mContainer;
     private FilterImageView mThumbView;
     private ImageButton mCameraShutterButton;
@@ -41,9 +40,6 @@ public class CameraAty extends Activity implements View.OnClickListener, TakePic
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.camera);
 
         mHeaderBar = findViewById(R.id.camera_header_bar);
@@ -63,17 +59,14 @@ public class CameraAty extends Activity implements View.OnClickListener, TakePic
         mSwitchModeButton.setOnClickListener(this);
         mSwitchCameraView.setOnClickListener(this);
 
-        mSaveRoot = "test";
-        mContainer.setRootPath(mSaveRoot);
-        initThumbnail();
+        mContainer.setRootPath(FileConfig.mSaveRoot);
     }
-
 
     /**
      * 加载缩略图
      */
     private void initThumbnail() {
-        String thumbFolder = FileOperateUtil.getFolderPath(this, FileOperateUtil.TYPE_THUMBNAIL, mSaveRoot);
+        String thumbFolder = FileOperateUtil.getFolderPath(this, FileOperateUtil.TYPE_THUMBNAIL, FileConfig.mSaveRoot);
         List<File> files = FileOperateUtil.listFiles(thumbFolder, ".jpg");
         if (files != null && files.size() > 0) {
             Bitmap thumbBitmap = BitmapFactory.decodeFile(files.get(0).getAbsolutePath());
@@ -95,7 +88,6 @@ public class CameraAty extends Activity implements View.OnClickListener, TakePic
 
     @Override
     public void onClick(View view) {
-        // TODO Auto-generated method stub
         switch (view.getId()) {
             case R.id.btn_shutter_camera:
                 mCameraShutterButton.setClickable(false);
@@ -190,5 +182,19 @@ public class CameraAty extends Activity implements View.OnClickListener, TakePic
     @Override
     protected void onResume() {
         super.onResume();
+        initThumbnail();
+        mContainer.previewPicture(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mContainer.previewPicture(null);
+    }
+
+    @Override
+    public void onPreviewFrame(byte[] data, Camera camera) {
+
+        Log.v(TAG, "length: " + data.length);
     }
 }

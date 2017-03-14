@@ -31,15 +31,6 @@
             android:textColor="@color/primary_title_text_color"
             android:textSize="22.0sp" />
 
-        <ImageView
-            android:id="@+id/header_bar_photo_to_camera"
-            android:layout_width="@dimen/album_header_btn_width"
-            android:layout_height="fill_parent"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="-2.0dip"
-            android:padding="12.0dip"
-            android:scaleType="fitCenter"
-            android:src="@drawable/btn_back_to_camera_selector" />
     </RelativeLayout>
 
 </LinearLayout>

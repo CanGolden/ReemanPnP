@@ -5,18 +5,7 @@
     android:background="@color/common_title_bg"
 
     android:gravity="center_vertical"
-    android:orientation="horizontal" >
-
-<Button
-        android:id="@+id/edit"
-        android:layout_width="0.0dip"
-        android:layout_height="fill_parent"
-        android:layout_weight="1.0"
-        android:background="@color/common_title_bg"
-        android:gravity="center"
-        android:text="@string/common_edit"
-        android:textColor="@drawable/color_white_yellow"
-        android:textSize="@dimen/album_rooter_bar_text_size" />
+    android:orientation="horizontal">
 
     <Button
         android:id="@+id/delete"
