@@ -3,6 +3,8 @@ package com.jcan.reemanpnp.forcamera;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Rect;
+import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.media.ThumbnailUtils;
 import android.os.Bundle;
@@ -19,7 +21,10 @@ import com.linj.album.view.FilterImageView;
 import com.linj.camera.view.CameraContainer;
 import com.linj.camera.view.CameraContainer.TakePictureListener;
 import com.linj.camera.view.CameraView.FlashMode;
+import com.megvii.cloud.http.CommonOperate;
+import com.megvii.cloud.http.Response;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.List;
 
@@ -36,6 +41,10 @@ public class CameraAty extends BaseActivity implements View.OnClickListener, Tak
     private ImageView mVideoIconView;
     private View mHeaderBar;
     private boolean isRecording = false;
+
+    private PreviewThread pt;
+    private boolean crun;
+    private CommonOperate operate;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -184,17 +193,74 @@ public class CameraAty extends BaseActivity implements View.OnClickListener, Tak
         super.onResume();
         initThumbnail();
         mContainer.previewPicture(this);
+        operate = new CommonOperate("5CXhn2aipcjIpiTuO_15-XKgl5zdW9ax", "ws5AOcapJXfJvpT8LZN1F6YrjUPN3L22", false);
+        pt = new PreviewThread();
+        crun = true;
+        takedata = true;
+        pt.start();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        crun = false;
+        takedata = false;
+        pt = null;
         mContainer.previewPicture(null);
     }
 
     @Override
     public void onPreviewFrame(byte[] data, Camera camera) {
 
-        Log.v(TAG, "length: " + data.length);
+//        Log.v(TAG, "length: " + takedata);
+        if (takedata) {
+            Log.v(TAG, "length: " + data.length);
+            Camera.Parameters parameters = camera.getParameters();
+            imageFormat = parameters.getPreviewFormat();
+            w = parameters.getPreviewSize().width;
+            h = parameters.getPreviewSize().height;
+            pdata = data;
+            takedata = false;
+        }
+    }
+
+    private byte[] pdata = new byte[]{};
+    private boolean takedata = true;
+    private int w;
+    private int h;
+    private int imageFormat;
+    private Rect rect;
+
+    private class PreviewThread extends Thread {
+        @Override
+        public void run() {
+            super.run();
+            while (crun) {
+                if (pdata.length < 1) {
+                    takedata = true;
+                    continue;
+                }
+
+                try {
+                    ByteArrayOutputStream outputstream = new ByteArrayOutputStream();
+                    rect = new Rect(0, 0, w, h);
+                    YuvImage yuvImg = new YuvImage(pdata, imageFormat, w, h, null);
+                    yuvImg.compressToJpeg(rect, 100, outputstream);
+                    Bitmap targetBitmap = BitmapFactory.decodeByteArray(outputstream.toByteArray(),
+                            0, outputstream.size());
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    targetBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                    byte[] arrayOfByte = baos.toByteArray();
+                    outputstream.close();
+                    baos.close();
+                    Response response = operate.detectByte(arrayOfByte, 1, "none");
+                    Log.v(TAG, "PreviewThread: detectByte: " + new String(response.getContent()));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Log.v(TAG, "22222: " + e.getMessage());
+                }
+                takedata = true;
+            }
+        }
     }
 }
